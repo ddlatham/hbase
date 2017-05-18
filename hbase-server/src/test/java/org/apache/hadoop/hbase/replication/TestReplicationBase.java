@@ -18,8 +18,11 @@
  */
 package org.apache.hadoop.hbase.replication;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
+import java.util.function.Supplier;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,15 +34,19 @@ import org.apache.hadoop.hbase.HConstants;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.Admin;
+import org.apache.hadoop.hbase.client.AsyncAdmin;
 import org.apache.hadoop.hbase.client.Connection;
 import org.apache.hadoop.hbase.client.ConnectionFactory;
 import org.apache.hadoop.hbase.client.Table;
+import org.apache.hadoop.hbase.client.TestAsyncAdminBase;
 import org.apache.hadoop.hbase.client.replication.ReplicationAdmin;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.hbase.zookeeper.MiniZooKeeperCluster;
 import org.apache.hadoop.hbase.zookeeper.ZooKeeperWatcher;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runners.Parameterized.Parameter;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This class is only a base for other integration-level replication tests.
@@ -82,6 +89,14 @@ public class TestReplicationBase {
   protected static final byte[] row = Bytes.toBytes("row");
   protected static final byte[] noRepfamName = Bytes.toBytes("norep");
 
+  @Parameter
+  public static boolean seperateOldWALs;
+
+  @Parameters
+  public static List<Boolean> params() {
+    return Arrays.asList(false, true);
+  }
+
   /**
    * @throws java.lang.Exception
    */
@@ -105,6 +120,9 @@ public class TestReplicationBase {
     conf1.setInt("replication.source.maxretriesmultiplier", 10);
     conf1.setFloat("replication.source.ratio", 1.0f);
     conf1.setBoolean("replication.source.eof.autorecovery", true);
+
+    // Parameter config
+    conf1.setBoolean(HConstants.SEPERATE_OLDLOGDIR, seperateOldWALs);
 
     utility1 = new HBaseTestingUtility(conf1);
     utility1.startMiniZKCluster();

@@ -308,6 +308,10 @@ public final class HConstants {
   /** Like the previous, but for old logs that are about to be deleted */
   public static final String HREGION_OLDLOGDIR_NAME = "oldWALs";
 
+  /** Separate old log into different dir by regionserver name **/
+  public static final String SEPERATE_OLDLOGDIR = "hbase.separate.oldlogdir.by.regionserver";
+  public static final boolean DEFAULT_SEPERATE_OLDLOGDIR = false;
+
   /** Staging dir used by bulk load */
   public static final String BULKLOAD_STAGING_DIR_NAME = "staging";
 

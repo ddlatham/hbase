@@ -273,6 +273,23 @@ public abstract class AbstractFSWALProvider<T extends AbstractFSWAL<?>> implemen
   }
 
   /**
+   * Construct the directory name for all old WALs on a given server. The default old WALs dir
+   * looks like: <code>hbase/oldWALs</code>. If you config hbase.separate.oldlogdir.by.regionserver
+   * to true, it looks like <code>hbase//oldWALs/kalashnikov.att.net,61634,1486865297088</code>.
+   * @param conf
+   * @param serverName Server name formatted as described in {@link ServerName}
+   * @return the relative WAL directory name
+   */
+  public static String getWALArchiveDirectoryName(Configuration conf, final String serverName) {
+    StringBuilder dirName = new StringBuilder(HConstants.HREGION_OLDLOGDIR_NAME);
+    if (conf.getBoolean(HConstants.SEPERATE_OLDLOGDIR, HConstants.DEFAULT_SEPERATE_OLDLOGDIR)) {
+      dirName.append("/");
+      dirName.append(serverName);
+    }
+    return dirName.toString();
+  }
+
+  /**
    * Pulls a ServerName out of a Path generated according to our layout rules. In the below layouts,
    * this method ignores the format of the logfile component. Current format: [base directory for
    * hbase]/hbase/.logs/ServerName/logfile or [base directory for
